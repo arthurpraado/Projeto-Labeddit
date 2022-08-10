@@ -8,6 +8,11 @@ import VoteSection from "../../components/VoteSection";
 import useToken from "../../hooks/useToken";
 import { Box, Button, Card, CardContent, TextField } from "@mui/material";
 import useForm from "../../hooks/useForm";
+import styled from "styled-components";
+
+const ContainerComments = styled.div`
+  border: 2px solid black;
+`;
 
 const PostPage = () => {
   const { id } = useParams();
@@ -48,42 +53,6 @@ const PostPage = () => {
       })
       .catch((error) => {
         console.log(error);
-      });
-  };
-
-  const deletePostVote = (id) => {
-    const url = `${BASE_URL}/posts/${id}/votes`;
-    axios
-      .delete(url, {
-        headers: {
-          Authorization: token,
-        },
-      })
-      .then(() => {
-        getPostDetails();
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
-  const onClickLikePost = (id, direction) => {
-    const urlPosts = `${BASE_URL}/posts/${id}/votes`;
-
-    const body = {
-      direction: direction,
-    };
-    axios
-      .post(urlPosts, body, {
-        headers: {
-          Authorization: token,
-        },
-      })
-      .then(() => {
-        getPostDetails();
-      })
-      .catch((error) => {
-        console.log(error.data);
       });
   };
 
@@ -129,14 +98,20 @@ const PostPage = () => {
 
   const mappedPostDetails = postDetails.map((post) => {
     return (
-      <div>
-        {post.username}
-        {post.body}
-        <VoteSection
-          post={post}
-          onClickLike={onClickLikeComment}
-          deleteVote={deleteCommentVote}
-        />
+      <div key={post.id}>
+        <Box display="flex" m="10px" flexDirection="column">
+          <Card elevation={4} sx={{ minWidth: 275 }}>
+            <CardContent>
+              <h3>Nome: {post.username}</h3>
+              <p> Comentário: {post.body}</p>
+              <VoteSection
+                post={post}
+                onClickLike={onClickLikeComment}
+                deleteVote={deleteCommentVote}
+              />
+            </CardContent>
+          </Card>
+        </Box>
       </div>
     );
   });
@@ -146,16 +121,11 @@ const PostPage = () => {
   return (
     <div>
       <Header />
-      <Box my={"20px"} mx={"10px"}>
-        <Card>
+      <Box display="flex" m="10px" flexDirection="column">
+        <Card elevation={4} sx={{ minWidth: 275 }}>
           <CardContent>
-            <h3>{parsedPost.username}</h3>
-            <p>{parsedPost.body}</p>
-            <VoteSection
-              post={post}
-              onClickLike={onClickLikePost}
-              deleteVote={deletePostVote}
-            />
+            <h3>Nome: {parsedPost.username}</h3>
+            <p> Post: {parsedPost.body}</p>
           </CardContent>
         </Card>
       </Box>
@@ -167,12 +137,11 @@ const PostPage = () => {
           onChange={onChange}
           multiline
           rows={4}
-          maxRows={8}
           fullWidth
         />
       </Box>
       <Button variant="contained" onClick={createComment}>
-        Postar
+        Comentar
       </Button>
       {mappedPostDetails}
       <Button variant="contained" onClick={() => goBack(navigate)}>
